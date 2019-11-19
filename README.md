@@ -2,4 +2,6 @@
 Add client-server interaction
 
 1st commit:
-Добавил взаимодействие клиента с сервером, пока что в функции main 
+Added client-server interaction so far in main function  \n
+2nd commit:
+Everything working 

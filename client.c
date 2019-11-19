@@ -9,17 +9,59 @@
 #include <unistd.h>
 
 #define handle_error(msg)\
- do { perror(msg); exit(EXIT_FAILURE); } while(0);
+ do { perror(msg); return -1; } while(0);
 
-// 1 - взять верхнюю карту из колоды
-// 2 - сообщить о том что пасуешь
-// 3 - сообщить о проигрыше
-// 4 - сообщить о выигрыше
-// 5 - сообщить о ничьей
+// 1 - take top card of the deck
+// 2 - report that you pass
+// 3 - report about losing
+// 4 - report aboun won
+// 5 - report about draw
+
+ int client_server_interaction(int sfd, int k, struct sockaddr_in *peer_addr, socklen_t *peer_addr_size){
+ 	char buff[2];
+
+ 	switch(k){
+ 		case 1:{
+ 			buff[0] = '1'; buff[1] = '\0';
+ 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) peer_addr, *peer_addr_size) == -1)
+ 			handle_error("sendto");
+ 			break;
+ 		}
+ 		case 2:{
+ 			buff[0] = '2'; buff[1] = '\0';
+ 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) peer_addr, *peer_addr_size) == -1)
+ 			handle_error("sendto");
+ 			break;
+ 		}
+ 		case 3:{
+ 			buff[0] = '3'; buff[1] = '\0';
+ 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) peer_addr, *peer_addr_size) == -1)
+ 			handle_error("sendto");
+ 			break;
+ 		}
+ 		case 4:{
+ 			buff[0] = '4'; buff[1] = '\0';
+ 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) peer_addr, *peer_addr_size) == -1)
+ 			handle_error("sendto");
+ 			break;
+ 		}
+ 		case 5:{
+ 			buff[0] = '5'; buff[1] = '\0';
+ 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) peer_addr, *peer_addr_size) == -1)
+ 			handle_error("sendto");
+ 			break;
+ 		}
+		default: {
+			return 0; //wrong variable k
+			break;
+		}
+	}
+	//retrun -1 -- message sending error
+ }
 
  int main(){
  	int sfd;
- 	int k = 3;
+ 	int k = 1;
  	char buff[2];
  	struct sockaddr_in peer_addr;
  	socklen_t peer_addr_size;
@@ -30,49 +72,10 @@
 
  	peer_addr.sin_family = AF_INET;
  	peer_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
- 	//peer_addr.sin_port = htons(2121);
- 	peer_addr.sin_port = htons(5000);
+ 	peer_addr.sin_port = htons(2121);
  	peer_addr_size = sizeof(struct sockaddr_in);
 
-
- 	switch(k){
- 		case 1:{
- 			buff[0] = '1'; buff[1] = '\0';
- 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size) == -1)
- 			handle_error("sendto");
- 			break;
- 		}
- 		case 2:{
- 			buff[0] = '2'; buff[1] = '\0';
- 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size) == -1)
- 			handle_error("sendto");
- 			break;
- 		}
- 		case 3:{
- 			buff[0] = '3'; buff[1] = '\0';
- 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size) == -1)
- 			handle_error("sendto");
- 			break;
- 		}
- 		case 4:{
- 			buff[0] = '4'; buff[1] = '\0';
- 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size) == -1)
- 			handle_error("sendto");
- 			break;
- 		}
- 		case 5:{
- 			buff[0] = '5'; buff[1] = '\0';
- 			if (sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size) == -1)
- 			handle_error("sendto");
- 			break;
- 		}
-		default: {
-			break;
-		}
- 	}
-
-
-
+ 	client_server_interaction(sfd, k, &(peer_addr), &(peer_addr_size));
 
  	close(sfd);
  	exit(EXIT_SUCCESS);
