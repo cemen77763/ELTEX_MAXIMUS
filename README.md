@@ -2,6 +2,6 @@
 Add client-server interaction
 
 1st commit:
-Added client-server interaction so far in main function  \n
+Added client-server interaction so far in main function  
 2nd commit:
 Everything working 
