@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
@@ -8,14 +9,35 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define handle_error(msg)\
- do { perror(msg); return -1; } while(0);
-
 // 1 - take top card of the deck
 // 2 - report that you pass
 // 3 - report about losing
 // 4 - report aboun won
 // 5 - report about draw
+// 9 - programm exited with Ctr+C
+
+#define handle_error(msg)\
+ do { perror(msg); return -1; } while(0);
+
+ void sighandler(int signo){
+ 	int sfd;
+ 	char buff[2];
+ 	struct sockaddr_in peer_addr;
+ 	socklen_t peer_addr_size;
+
+ 	sfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+ 	peer_addr.sin_family = AF_INET;
+ 	peer_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+ 	peer_addr.sin_port = htons(2121);
+ 	peer_addr_size = sizeof(struct sockaddr_in);
+
+ 	buff[0] = '9'; buff[1] = '\n';
+ 	sendto(sfd, buff, 2, 0, (struct sockaddr*) &peer_addr, peer_addr_size);
+
+ 	close(sfd);
+ 	exit(EXIT_SUCCESS);
+ }
 
  int client_server_interaction(int sfd, int k, struct sockaddr_in *peer_addr, socklen_t *peer_addr_size){
  	char buff[2];
@@ -66,6 +88,8 @@
  	struct sockaddr_in peer_addr;
  	socklen_t peer_addr_size;
 
+ 	signal(2, sighandler);
+
  	sfd = socket(AF_INET, SOCK_DGRAM, 0);
  	if (sfd == -1)
  		handle_error("socket");
@@ -75,8 +99,9 @@
  	peer_addr.sin_port = htons(2121);
  	peer_addr_size = sizeof(struct sockaddr_in);
 
- 	client_server_interaction(sfd, k, &(peer_addr), &(peer_addr_size));
+	client_server_interaction(sfd, k, &peer_addr, &peer_addr_size);
 
  	close(sfd);
  	exit(EXIT_SUCCESS);
  }
+
